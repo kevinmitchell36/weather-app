@@ -1,8 +1,8 @@
 
-function SearchBar({children, onSelect}) {
+function SearchBar({title, onSelect}) {
   return (
     <div>
-      <button onClick={onSelect}>{children}</button>
+      <button onClick={ () => onSelect({title})}>{title}</button>
     </div>
   )
 }
