@@ -1,7 +1,7 @@
 
 function DailyWeather({image, day, description, high, low}) {
   return (
-    <div>
+    <ul>
       <li>
         <img src={image} alt="weather image" />
         <p>{day}</p>
@@ -9,7 +9,7 @@ function DailyWeather({image, day, description, high, low}) {
         <p>{high}</p>
         <p>{low}</p>
       </li>
-    </div>
+    </ul>
   )
 }
 
