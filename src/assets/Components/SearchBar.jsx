@@ -1,11 +1,8 @@
-import React from 'react'
 
-function SearchBar() {
+function SearchBar({children, onSelect}) {
   return (
     <div>
-      <button>Pittsburgh</button>
-      <button>Chicago</button>
-      <button>McKinney</button>
+      <button onClick={onSelect}>{children}</button>
     </div>
   )
 }
