@@ -1,17 +1,29 @@
 import { useState } from 'react'
 import SearchBar from './assets/Components/SearchBar'
-import weatherIcon from './assets/images/weather-icon-png-11102.png'
 import DailyWeather from './assets/Components/DailyWeather'
+import DaySelect from './assets/Components/DaySelect'
+import weatherIcon from './assets/images/weather-icon-png-11102.png'
 import { forecasts } from './data'
 import './App.css'
 
 function App() {
-  const [ selectedCity, setSelectedCity ] = useState(forecasts[0].daily)
-  function handleLocation(selection) {
-    let index = forecasts.map(forecast => forecast.city).indexOf(selection.title)
-    let cityWeather = forecasts[index].daily
-    setSelectedCity(cityWeather)
-  } 
+  const [ selectedCity, setSelectedCity ] = useState('Pittsburgh')
+  const [ dayAmount, setDayAmount] = useState(7)
+  console.log(dayAmount)
+  const [ forecast, setForecast ] = useState(forecasts[forecasts.findIndex(item => item['city'] === selectedCity)].daily.slice(0, dayAmount))
+
+  function handleLocation(location) {
+    let chosenLocation = location.title
+    setSelectedCity(chosenLocation)
+    setForecast(forecasts[forecasts.findIndex(item => item['city'] === chosenLocation)].daily)
+  }
+
+  function handleDayChoice(number) {
+    let daysToSet = number.amount
+    setDayAmount(daysToSet)
+    setForecast(forecasts[forecasts.findIndex(item => item['city'] === selectedCity)].daily.slice(0, daysToSet))
+  }
+
 
   return (
     <>
@@ -26,7 +38,7 @@ function App() {
      <section className="forecast">
       <h1>Your forecast</h1>
       <p>Select from the right for different day amounts</p>
-      {selectedCity.map(day => 
+      {forecast.map(day => 
         <DailyWeather
           key={day.name} 
           image={day.image}
@@ -36,6 +48,10 @@ function App() {
           low={day.low}>
         </DailyWeather>
       )}      
+     </section>
+     <section className='day-select'>
+      <DaySelect amount={5} onDayChoice={handleDayChoice}>5 day</DaySelect>
+      <DaySelect amount={7} onDayChoice={handleDayChoice}>7 day</DaySelect>
      </section>
     </>
   )
