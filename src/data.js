@@ -2,6 +2,11 @@ import partlyCloudyImg from './assets/images/partly-cloudy.png'
 import rainyImg from './assets/images/rainy.png'
 import sunnyImg from './assets/images/sunny.png'
 import windyImg from './assets/images/windy.png'
+import { API_KEY } from '.env'
+
+
+export const data = `https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&exclude=minutely,alerts&appid=${API_KEY}`
+
 
 export const forecasts = [
   {

@@ -5,11 +5,12 @@ import DaySelect from './assets/Components/DaySelect'
 import weatherIcon from './assets/images/weather-icon-png-11102.png'
 import { forecasts } from './data'
 import './App.css'
+import { data } from './data'
 
 function App() {
+  console.log(data)
   const [ selectedCity, setSelectedCity ] = useState('Pittsburgh')
   const [ dayAmount, setDayAmount] = useState(7)
-  console.log(dayAmount)
   const [ forecast, setForecast ] = useState(forecasts[forecasts.findIndex(item => item['city'] === selectedCity)].daily.slice(0, dayAmount))
 
   function handleLocation(location) {
