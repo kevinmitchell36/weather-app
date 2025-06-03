@@ -3,15 +3,27 @@ import SearchBar from './assets/Components/SearchBar'
 import DailyWeather from './assets/Components/DailyWeather'
 import DaySelect from './assets/Components/DaySelect'
 import weatherIcon from './assets/images/weather-icon-png-11102.png'
-import { forecasts } from './data'
+import { forecasts, data } from './data'
 import './App.css'
-import { data } from './data'
+const apiKey = import.meta.env.VITE_API_KEY
 
 function App() {
-  console.log(data)
   const [ selectedCity, setSelectedCity ] = useState('Pittsburgh')
   const [ dayAmount, setDayAmount] = useState(7)
   const [ forecast, setForecast ] = useState(forecasts[forecasts.findIndex(item => item['city'] === selectedCity)].daily.slice(0, dayAmount))
+
+  function directGeocode(city) {
+    fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${city.title}&limit=5&appid=${apiKey}`)
+    .then(res => res.json())
+    .then(data => getWeather(data[0].lat, data[0].lon))
+    
+  }
+
+  function getWeather(lat, lon) {
+    fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&appid=${apiKey}`)
+    .then(res =>  res.json())
+    .then(data => console.log(data))
+  }
 
   function handleLocation(location) {
     let chosenLocation = location.title
@@ -32,9 +44,7 @@ function App() {
       <h1>Welcome to Weather or Not</h1>
       <p>When would you like to run today?</p>
       <img src={weatherIcon} alt="" />
-      <SearchBar title='Pittsburgh' onSelect={handleLocation}/>
-      <SearchBar title='Chicago' onSelect={handleLocation}/>
-      <SearchBar title='McKinney' onSelect={handleLocation}/>
+      <SearchBar title='London' onSelect={directGeocode}/>
      </section>
      <section className="forecast">
       <h1>Your forecast</h1>
