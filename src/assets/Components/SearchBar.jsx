@@ -1,8 +1,9 @@
 
-function SearchBar({title, onSelect}) {
+function SearchBar({text, onSelect}) {
   return (
     <div>
-      <button onClick={ () => onSelect({title})}>{title}</button>
+      <input type="text" onChange={(e) => onSelect(e.target.value)} placeholder="Search Your City" />
+      {/* <button onClick={ () => onSelect({title})}>{title}</button> */}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import SearchBar from './assets/Components/SearchBar'
 import DailyWeather from './assets/Components/DailyWeather'
 import DaySelect from './assets/Components/DaySelect'
@@ -8,15 +8,23 @@ import './App.css'
 const apiKey = import.meta.env.VITE_API_KEY
 
 function App() {
-  const [ selectedCity, setSelectedCity ] = useState('Pittsburgh')
+  const [searchedCity, setSearchedCity] = useState('London')
+  // const [ selectedCity, setSelectedCity ] = useState('Pittsburgh')
   const [ dayAmount, setDayAmount] = useState(7)
-  const [ forecast, setForecast ] = useState(forecasts[forecasts.findIndex(item => item['city'] === selectedCity)].daily.slice(0, dayAmount))
+  // const [ forecast, setForecast ] = useState(forecasts[forecasts.findIndex(item => item['city'] === selectedCity)].daily.slice(0, dayAmount))
+  
+  useEffect(() => {
+    directGeocode(searchedCity)
+  }, [searchedCity])
+
+  function handleInputChange(event) {
+    setSearchedCity(event)
+  }
 
   function directGeocode(city) {
-    fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${city.title}&limit=5&appid=${apiKey}`)
+    fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${apiKey}`)
     .then(res => res.json())
     .then(data => getWeather(data[0].lat, data[0].lon))
-    
   }
 
   function getWeather(lat, lon) {
@@ -25,17 +33,17 @@ function App() {
     .then(data => console.log(data))
   }
 
-  function handleLocation(location) {
-    let chosenLocation = location.title
-    setSelectedCity(chosenLocation)
-    setForecast(forecasts[forecasts.findIndex(item => item['city'] === chosenLocation)].daily)
-  }
+  // function handleLocation(location) {
+  //   let chosenLocation = location.title
+  //   setSelectedCity(chosenLocation)
+  //   setForecast(forecasts[forecasts.findIndex(item => item['city'] === chosenLocation)].daily)
+  // }
 
-  function handleDayChoice(number) {
-    let daysToSet = number.amount
-    setDayAmount(daysToSet)
-    setForecast(forecasts[forecasts.findIndex(item => item['city'] === selectedCity)].daily.slice(0, daysToSet))
-  }
+  // function handleDayChoice(number) {
+  //   let daysToSet = number.amount
+  //   setDayAmount(daysToSet)
+  //   setForecast(forecasts[forecasts.findIndex(item => item['city'] === selectedCity)].daily.slice(0, daysToSet))
+  // }
 
 
   return (
@@ -44,12 +52,12 @@ function App() {
       <h1>Welcome to Weather or Not</h1>
       <p>When would you like to run today?</p>
       <img src={weatherIcon} alt="" />
-      <SearchBar title='London' onSelect={directGeocode}/>
+      <SearchBar text={searchedCity} onSelect={handleInputChange}/>
      </section>
      <section className="forecast">
       <h1>Your forecast</h1>
       <p>Select from the right for different day amounts</p>
-      {forecast.map(day => 
+      {/* {forecast.map(day => 
         <DailyWeather
           key={day.name} 
           image={day.image}
@@ -58,11 +66,11 @@ function App() {
           high={day.high} 
           low={day.low}>
         </DailyWeather>
-      )}      
+      )}       */}
      </section>
      <section className='day-select'>
-      <DaySelect amount={5} onDayChoice={handleDayChoice}>5 day</DaySelect>
-      <DaySelect amount={7} onDayChoice={handleDayChoice}>7 day</DaySelect>
+      {/* <DaySelect amount={5} onDayChoice={handleDayChoice}>5 day</DaySelect>
+      <DaySelect amount={7} onDayChoice={handleDayChoice}>7 day</DaySelect> */}
      </section>
     </>
   )
