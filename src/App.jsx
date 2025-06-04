@@ -9,10 +9,10 @@ const apiKey = import.meta.env.VITE_API_KEY
 
 function App() {
   const [searchedCity, setSearchedCity] = useState('London')
-  // const [ selectedCity, setSelectedCity ] = useState('Pittsburgh')
+  const [ selectedCity, setSelectedCity ] = useState()
   const [ dayAmount, setDayAmount] = useState(7)
   // const [ forecast, setForecast ] = useState(forecasts[forecasts.findIndex(item => item['city'] === selectedCity)].daily.slice(0, dayAmount))
-  
+
   useEffect(() => {
     directGeocode(searchedCity)
   }, [searchedCity])
@@ -30,7 +30,7 @@ function App() {
   function getWeather(lat, lon) {
     fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&appid=${apiKey}`)
     .then(res =>  res.json())
-    .then(data => console.log(data))
+    .then(data => setSelectedCity(data))
   }
 
   // function handleLocation(location) {
@@ -57,16 +57,21 @@ function App() {
      <section className="forecast">
       <h1>Your forecast</h1>
       <p>Select from the right for different day amounts</p>
-      {/* {forecast.map(day => 
-        <DailyWeather
-          key={day.name} 
-          image={day.image}
-          day={day.name}
-          description={day.description} 
-          high={day.high} 
-          low={day.low}>
-        </DailyWeather>
-      )}       */}
+      {!selectedCity && <p>Please enter a city</p> }
+      {selectedCity ? (
+      <div>
+        { selectedCity.daily.map(day => 
+          <DailyWeather
+            key={day.dt} 
+            image={day.weather[0].icon}
+           
+            description={day.weather[0].description} 
+            high={day.temp.max} 
+            low={day.temp.min}>
+          </DailyWeather>
+        )}  
+      </div>
+      ) : null}
      </section>
      <section className='day-select'>
       {/* <DaySelect amount={5} onDayChoice={handleDayChoice}>5 day</DaySelect>
