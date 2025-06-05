@@ -1,16 +1,16 @@
 
-function DailyWeather({image, day, description, high, low}) {
+function Hourly({image, hour, temp, feels}) {
   const imageIcon = `https://openweathermap.org/img/wn/${image}.png`
   return (
     <ul>
       <li>
         <img src={imageIcon} alt="weather image" />
-        <p>{description}</p>
-        <p>{high}</p>
-        <p>{low}</p>
+        <p>{hour}</p>
+        <p>{temp} C</p>
+        <p>{feels} C</p>
       </li>
     </ul>
   )
 }
 
-export default DailyWeather
+export default Hourly
