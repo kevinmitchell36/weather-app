@@ -15,22 +15,44 @@ function App() {
   
 
   useEffect(() => {
-    directGeocode(searchedCity)
-    function directGeocode(city) {
-      fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${apiKey}`)
-      .then(res => res.json())
-      .then(data => getWeather(data[0].lat, data[0].lon))
+    async function directGeocode(city) {
+      try {
+        const res = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${apiKey}`);
+        const data = await res.json();
+        if (data.length > 0) {
+          getWeather(data[0].lat, data[0].lon);
+        }
+      } catch (error) {
+        console.error("Geocoding error:", error);
+      }
     }
-    function getWeather(lat, lon) {
-      fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&appid=${apiKey}`)
-      .then(res =>  res.json())
-      .then(data => {
-        setSelectedCity(data),
-        setDaily(data.daily),
-        setHourly(data.hourly.slice(24))
-      })
+
+    async function getWeather(lat, lon) {
+      try {
+        const res = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&appid=${apiKey}`);
+        const data = await res.json();
+
+        const mappedHourly = data.hourly.slice(24).map(hour => ({
+          image: hour.weather[0].icon,
+          dt: new Date(hour.dt * 1000).getHours() > 12 ? new Date(hour.dt * 1000).getHours() - 12 : new Date(hour.dt * 1000).getHours(), 
+          temp: Math.round(hour.temp - 273.15),
+          feels_like: Math.round(hour.feels_like - 273.15)
+        }));
+
+        setSelectedCity(data); 
+        setDaily(data.daily);
+        setHourly(mappedHourly);
+
+      } catch (error) {
+        console.error("Weather fetch error:", error);
+      }
     }
-  }, [searchedCity])
+
+    if (searchedCity) {
+      directGeocode(searchedCity);
+    }
+  }, [searchedCity]);
+
   
   function handleInputChange(event) {
     setSearchedCity(event)
@@ -38,14 +60,12 @@ function App() {
   
   function handleDayChoice(number) {
     if (number.amount === 3) {
-      setDaily(daily.slice(0, -number.amount))
+      setDaily(daily.slice(0, - number.amount))
     } else {
       setDaily(selectedCity.daily)
     }
   }
   
- 
-
   return (
     <>
      <section className='banner'>
@@ -54,13 +74,11 @@ function App() {
       <img src={weatherIcon} alt="" />
       <SearchBar text={searchedCity} onSelect={handleInputChange}/>
      </section>
+
      <section className="forecast">
       <h1>Your forecast</h1>
       <p>Select from the right for different day amounts</p>
-      {!selectedCity && <p>Please enter a city</p> }
-      {selectedCity ? (
-      <div>
-        { daily.map(day => 
+        {daily.map(day => 
           <DailyWeather
             key={day.dt} 
             image={day.weather[0].icon}
@@ -69,23 +87,17 @@ function App() {
             low={day.temp.min}>
           </DailyWeather>
         )}  
-      </div>
-      ) : null}
      </section>
+
      <section className='day-select'>
       <DaySelect amount={3} onDayChoice={handleDayChoice}>5 day</DaySelect>
       <DaySelect amount={0} onDayChoice={handleDayChoice}>8 day</DaySelect>
      </section>
+
      <section className='hourly'>
-      {!hourly && <p>Please enter a city</p>}
-      {hourly ? (
-     <div>
       {hourly.map(hour => 
-      
-       <Hourly key={hour.dt} image={hour.weather[0].icon} hour={new Date(hour.dt * 1000).getHours()} temp={Math.round(hour.temp - 273.15)} feels={Math.round(hour.feels_like - 273.15)}></Hourly>
+       <Hourly key={hour.dt} image={hour.image} hour={hour.dt} temp={hour.temp} feels={hour.feels_like}></Hourly>
       )}
-     </div>
-      ): null}
      </section>
     </>
   )
